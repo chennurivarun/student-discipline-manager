@@ -9,27 +9,44 @@ import {
   SidebarMenuButton,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarInset,
 } from "@/components/ui/sidebar";
 import { Home, ClipboardList, UserCircle, Settings, LogOut } from "lucide-react";
 import { StudentDashboard } from "@/components/StudentDashboard";
 import { StaffDashboard } from "@/components/StaffDashboard";
+import { PunishmentManagement } from "@/components/PunishmentManagement";
+import { StudentPunishments } from "@/components/StudentPunishments";
+import { useState } from "react";
+
+type View = "overview" | "punishments" | "profile";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
+  const [currentView, setCurrentView] = useState<View>("overview");
 
   const studentMenuItems = [
-    { icon: Home, label: "Overview", href: "/dashboard" },
-    { icon: ClipboardList, label: "Punishments", href: "/dashboard/punishments" },
-    { icon: UserCircle, label: "Profile", href: "/dashboard/profile" },
+    { icon: Home, label: "Overview", view: "overview" as const },
+    { icon: ClipboardList, label: "Punishments", view: "punishments" as const },
+    { icon: UserCircle, label: "Profile", view: "profile" as const },
   ];
 
   const staffMenuItems = [
-    { icon: Home, label: "Overview", href: "/dashboard" },
-    { icon: ClipboardList, label: "Manage Punishments", href: "/dashboard/punishments" },
-    { icon: UserCircle, label: "Students", href: "/dashboard/students" },
+    { icon: Home, label: "Overview", view: "overview" as const },
+    { icon: ClipboardList, label: "Manage Punishments", view: "punishments" as const },
+    { icon: UserCircle, label: "Profile", view: "profile" as const },
   ];
 
   const menuItems = user?.role === "student" ? studentMenuItems : staffMenuItems;
+
+  const renderContent = () => {
+    if (currentView === "overview") {
+      return user?.role === "student" ? <StudentDashboard /> : <StaffDashboard />;
+    }
+    if (currentView === "punishments") {
+      return user?.role === "student" ? <StudentPunishments /> : <PunishmentManagement />;
+    }
+    return <div>Profile view coming soon</div>;
+  };
 
   return (
     <SidebarProvider>
@@ -44,11 +61,12 @@ export default function Dashboard() {
               <SidebarMenu>
                 {menuItems.map((item) => (
                   <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton asChild>
-                      <a href={item.href} className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.label}</span>
-                      </a>
+                    <SidebarMenuButton 
+                      onClick={() => setCurrentView(item.view)}
+                      className="flex items-center gap-2"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -62,9 +80,11 @@ export default function Dashboard() {
             </SidebarGroup>
           </SidebarContent>
         </Sidebar>
-        <main className="flex-1 p-6">
-          {user?.role === "student" ? <StudentDashboard /> : <StaffDashboard />}
-        </main>
+        <SidebarInset>
+          <main className="flex-1 p-6">
+            {renderContent()}
+          </main>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );
