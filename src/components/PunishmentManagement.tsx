@@ -9,8 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { CreatePunishmentForm } from "./CreatePunishmentForm";
 
 interface Punishment {
   id: string;
@@ -23,7 +22,6 @@ interface Punishment {
 }
 
 export function PunishmentManagement() {
-  const { toast } = useToast();
   const [punishments] = useState<Punishment[]>([
     {
       id: "1",
@@ -36,21 +34,11 @@ export function PunishmentManagement() {
     },
   ]);
 
-  const handleAddPunishment = () => {
-    toast({
-      title: "Coming Soon",
-      description: "Punishment creation will be implemented in the next phase.",
-    });
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Punishment Management</h2>
-        <Button onClick={handleAddPunishment}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Punishment
-        </Button>
+        <CreatePunishmentForm />
       </div>
 
       <Card>
