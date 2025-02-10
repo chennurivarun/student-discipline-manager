@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   SidebarProvider, 
@@ -18,7 +19,7 @@ import { PunishmentManagement } from "@/components/PunishmentManagement";
 import { StudentPunishments } from "@/components/StudentPunishments";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "@/components/ui/use-toast";
 
 type View = "overview" | "punishments" | "profile";
 
