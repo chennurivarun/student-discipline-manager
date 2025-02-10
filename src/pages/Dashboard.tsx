@@ -91,7 +91,7 @@ export default function Dashboard() {
         {renderContent()}
       </main>
 
-      {/* iOS-style bottom bar */}
+      {/* macOS-style bottom bar */}
       <nav className="fixed bottom-0 left-0 right-0 glass-card bg-white/80 backdrop-blur-md border-t animate-in slide-in-from-bottom duration-500">
         <div className="flex items-center justify-around p-2 max-w-4xl mx-auto">
           {menuItems.map((item) => (
