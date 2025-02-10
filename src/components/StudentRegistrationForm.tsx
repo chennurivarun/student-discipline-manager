@@ -50,7 +50,7 @@ export function StudentRegistrationForm() {
       login(userData);
       toast({
         title: "Registration Successful",
-        description: "Welcome to the Student Portal",
+        description: "Welcome to the Student Portal! You can now access your dashboard.",
       });
       navigate('/dashboard');
     } catch (error) {
