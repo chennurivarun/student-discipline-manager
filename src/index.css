@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -63,9 +64,42 @@
 }
 
 .fade-in {
-  @apply animate-in duration-500;
+  @apply animate-in fade-in-0 duration-500;
 }
 
 .slide-in {
   @apply animate-in slide-in-from-bottom-4 duration-500;
+}
+
+/* Enhanced animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Enhanced glassmorphism */
+.glass-morphism {
+  @apply bg-white/40 backdrop-blur-md border border-white/20 shadow-xl;
+}
+
+/* iOS-style bottom bar specific styles */
+.bottom-bar-item {
+  @apply flex flex-col items-center p-2 rounded-lg transition-all duration-300;
+}
+
+.bottom-bar-item:hover {
+  @apply scale-110;
+}
+
+.bottom-bar-icon {
+  @apply h-6 w-6 transition-all duration-300;
+}
+
+.bottom-bar-label {
+  @apply text-xs mt-1 transition-all duration-300;
 }
