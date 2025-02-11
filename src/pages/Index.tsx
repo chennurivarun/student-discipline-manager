@@ -99,8 +99,8 @@ const LoginCard = ({
   const [password, setPassword] = useState('');
 
   return (
-    <div className="gradient-border">
-      <Card className="glass-card">
+    <div >
+      <Card>
         <CardHeader>
           <CardTitle className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             {title}
@@ -133,7 +133,7 @@ const LoginCard = ({
             </div>
             <Button 
               type="submit" 
-              className="w-full glass-morphism hover:bg-primary/20" 
+              className="w-full bg-primary hover:bg-primary/20" 
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}

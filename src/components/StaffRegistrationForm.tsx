@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,40 +30,47 @@ export function StaffRegistrationForm() {
     setIsLoading(true);
     
     try {
-      // Enhanced validation for email
+      console.log("📩 Signing up with email:", `"${formData.email.trim()}"`);
+
+      // Email format validation
       const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-      if (!emailRegex.test(formData.email)) {
-        throw new Error('Please enter a valid email address');
+      if (!emailRegex.test(formData.email.trim())) {
+        throw new Error('Invalid email format. Please enter a valid email address.');
       }
 
-      // Validate password length
+      // Password validation
       if (formData.password.length < 6) {
-        throw new Error('Password must be at least 6 characters long');
+        throw new Error('Password must be at least 6 characters long.');
       }
 
-      // Basic validation
-      if (!formData.name || !formData.department) {
-        throw new Error('Please fill in all required fields');
+      // Ensure all required fields are filled
+      if (!formData.name.trim() || !formData.department) {
+        throw new Error('Please fill in all required fields.');
       }
 
-      // Prepare user metadata
+      // User metadata
       const metadata = {
         name: formData.name.trim(),
         role: 'staff',
-        department: formData.department
+        department: formData.department,
       };
 
-      // Sign up the user
+      console.log("📩 Sending to Supabase:", { email: formData.email.trim(), metadata });
+
+      // Supabase Sign-Up
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email.trim(),
         password: formData.password,
         options: {
           data: metadata,
-          emailRedirectTo: `${window.location.origin}/auth`
-        }
+          emailRedirectTo: `${window.location.origin}/auth`,
+        },
       });
 
+      console.log("✅ Supabase Response:", signUpData);
+
       if (signUpError) {
+        console.error("❌ Supabase SignUp Error:", signUpError);
         throw new Error(signUpError.message);
       }
 
@@ -72,12 +78,13 @@ export function StaffRegistrationForm() {
         title: "Registration Successful",
         description: "Please check your email to verify your account.",
       });
-      navigate('/auth');
-    } catch (error: any) {
-      console.error('Registration error:', error);
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error("❌ Registration error:", error);
       toast({
         title: "Registration Failed",
-        description: error.message || "Please try again later",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -119,7 +126,7 @@ export function StaffRegistrationForm() {
         <div className="relative">
           <Input
             type="password"
-            placeholder="Password"
+            placeholder="Password (Min. 6 characters)"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             required

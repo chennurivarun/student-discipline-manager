@@ -33,59 +33,122 @@ export function StudentRegistrationForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
 
+  // const onSubmit = async (data: FormData) => {
+  //   setIsLoading(true);
+  //   try {
+  //     // Enhanced validation for email
+  //     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  //     if (!emailRegex.test(data.email)) {
+  //       throw new Error('Please enter a valid email address');
+  //     }
+
+  //     // Validate password length
+  //     if (data.password.length < 6) {
+  //       throw new Error('Password must be at least 6 characters long');
+  //     }
+
+  //     // Prepare user metadata
+  //     const metadata = {
+  //       name: data.fullName.trim(),
+  //       role: 'student',
+  //       department: data.department,
+  //       year: data.year ? parseInt(data.year) : null,
+  //       semester: data.semester ? parseInt(data.semester) : null,
+  //     };
+
+  //     // Sign up the user
+  //     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+  //       email: data.email,
+  //       password: data.password,
+  //       options: {
+  //         data: metadata,
+  //         emailRedirectTo: `${window.location.origin}/auth`
+  //       }
+  //     });
+
+  //     if (signUpError) {
+  //       throw new Error(signUpError.message);
+  //     }
+
+  //     toast({
+  //       title: "Registration Successful",
+  //       description: "Please check your email to verify your account.",
+  //     });
+  //     navigate('/auth');
+  //   } catch (error) {
+  //     console.error('Registration error:', error);
+  //     toast({
+  //       title: "Registration Failed",
+  //       description: error.message || "Please try again later",
+  //       variant: "destructive",
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      // Enhanced validation for email
+      console.log("📩 Signing up with email:", `"${data.email.trim()}"`);
+  
+      // Ensure email format is correct
       const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-      if (!emailRegex.test(data.email)) {
-        throw new Error('Please enter a valid email address');
+      if (!emailRegex.test(data.email.trim())) {
+        throw new Error("Invalid email format. Please enter a valid email address.");
       }
-
-      // Validate password length
+  
+      // Ensure password is at least 6 characters
       if (data.password.length < 6) {
-        throw new Error('Password must be at least 6 characters long');
+        throw new Error("Password must be at least 6 characters long.");
       }
-
-      // Prepare user metadata
+  
+      // User metadata for Supabase
       const metadata = {
         name: data.fullName.trim(),
-        role: 'student',
+        role: "student",
         department: data.department,
         year: data.year ? parseInt(data.year) : null,
         semester: data.semester ? parseInt(data.semester) : null,
       };
-
-      // Sign up the user
+  
+      console.log("📩 Sending data to Supabase:", { email: data.email.trim(), metadata });
+  
+      // Supabase SignUp
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: data.email.trim(),
         password: data.password,
         options: {
           data: metadata,
-          emailRedirectTo: `${window.location.origin}/auth`
-        }
+          emailRedirectTo: `${window.location.origin}/auth`,
+        },
       });
-
+  
+      console.log("✅ Supabase SignUp Response:", signUpData);
+  
       if (signUpError) {
+        console.error("❌ Full Supabase SignUp Error:", signUpError);
         throw new Error(signUpError.message);
       }
-
+  
       toast({
         title: "Registration Successful",
         description: "Please check your email to verify your account.",
       });
-      navigate('/auth');
-    } catch (error: any) {
-      console.error('Registration error:', error);
+  
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("❌ Registration error:", error);
       toast({
         title: "Registration Failed",
-        description: error.message || "Please try again later",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
