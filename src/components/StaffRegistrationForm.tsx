@@ -31,8 +31,9 @@ export function StaffRegistrationForm() {
     setIsLoading(true);
     
     try {
-      // Validate email format
-      if (!formData.email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
+      // Enhanced validation for email
+      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      if (!emailRegex.test(formData.email)) {
         throw new Error('Please enter a valid email address');
       }
 
@@ -46,22 +47,25 @@ export function StaffRegistrationForm() {
         throw new Error('Please fill in all required fields');
       }
 
+      // Prepare user metadata
+      const metadata = {
+        name: formData.name.trim(),
+        role: 'staff',
+        department: formData.department
+      };
+
+      // Sign up the user
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email.toLowerCase().trim(),
+        email: formData.email.trim(),
         password: formData.password,
         options: {
-          data: {
-            name: formData.name.trim(),
-            role: 'staff',
-            department: formData.department,
-          },
+          data: metadata,
           emailRedirectTo: `${window.location.origin}/auth`
         }
       });
 
       if (signUpError) {
-        console.error('Signup error details:', signUpError);
-        throw signUpError;
+        throw new Error(signUpError.message);
       }
 
       toast({

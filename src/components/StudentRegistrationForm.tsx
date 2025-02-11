@@ -36,8 +36,9 @@ export function StudentRegistrationForm() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      // Validate email format
-      if (!data.email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
+      // Enhanced validation for email
+      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      if (!emailRegex.test(data.email)) {
         throw new Error('Please enter a valid email address');
       }
 
@@ -46,24 +47,27 @@ export function StudentRegistrationForm() {
         throw new Error('Password must be at least 6 characters long');
       }
 
+      // Prepare user metadata
+      const metadata = {
+        name: data.fullName.trim(),
+        role: 'student',
+        department: data.department,
+        year: data.year ? parseInt(data.year) : null,
+        semester: data.semester ? parseInt(data.semester) : null,
+      };
+
+      // Sign up the user
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: data.email.toLowerCase().trim(),
+        email: data.email.trim(),
         password: data.password,
         options: {
-          data: {
-            name: data.fullName,
-            role: 'student',
-            department: data.department,
-            year: parseInt(data.year),
-            semester: parseInt(data.semester),
-          },
+          data: metadata,
           emailRedirectTo: `${window.location.origin}/auth`
         }
       });
 
       if (signUpError) {
-        console.error('Signup error details:', signUpError);
-        throw signUpError;
+        throw new Error(signUpError.message);
       }
 
       toast({
@@ -105,6 +109,9 @@ export function StudentRegistrationForm() {
               className="pl-10"
             />
             <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+            {errors.studentId && (
+              <p className="text-sm text-red-500 mt-1">Please enter a valid 8-digit student ID</p>
+            )}
           </div>
 
           <div className="relative">
@@ -114,19 +121,25 @@ export function StudentRegistrationForm() {
               className="pl-10"
             />
             <UserPlus className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+            {errors.fullName && (
+              <p className="text-sm text-red-500 mt-1">Full name is required</p>
+            )}
           </div>
 
           <div className="relative">
             <Input
               {...register("email", { 
                 required: true,
-                pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+                pattern: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
               })}
               type="email"
               placeholder="Email Address"
               className="pl-10"
             />
             <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+            {errors.email && (
+              <p className="text-sm text-red-500 mt-1">Please enter a valid email address</p>
+            )}
           </div>
 
           <div className="relative">
@@ -140,6 +153,9 @@ export function StudentRegistrationForm() {
               className="pl-10"
             />
             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+            {errors.password && (
+              <p className="text-sm text-red-500 mt-1">Password must be at least 6 characters</p>
+            )}
           </div>
 
           <div className="relative">
@@ -202,6 +218,9 @@ export function StudentRegistrationForm() {
               className="pl-10"
             />
             <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+            {errors.mobile && (
+              <p className="text-sm text-red-500 mt-1">Please enter a valid mobile number</p>
+            )}
           </div>
 
           <Button
