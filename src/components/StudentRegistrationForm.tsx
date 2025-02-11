@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,13 +13,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { User, UserPlus, School, Phone } from 'lucide-react';
+import { User, UserPlus, School, Phone, Lock } from 'lucide-react';
 
 const departments = ['CSE', 'ECE', 'ME', 'CE'];
 
 interface FormData {
   studentId: string;
   fullName: string;
+  email: string;
+  password: string;
   department: string;
   year: string;
   semester: string;
@@ -28,35 +30,38 @@ interface FormData {
 
 export function StudentRegistrationForm() {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const userData = {
-        id: data.studentId,
-        name: data.fullName,
-        role: 'student' as const,
-        department: data.department,
-        year: parseInt(data.year),
-        semester: parseInt(data.semester),
-      };
+      // Register the user with Supabase
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            name: data.fullName,
+            role: 'student',
+            department: data.department,
+            year: parseInt(data.year),
+            semester: parseInt(data.semester),
+          }
+        }
+      });
 
-      login(userData);
+      if (signUpError) throw signUpError;
+
       toast({
         title: "Registration Successful",
-        description: "Welcome to the Student Portal! You can now access your dashboard.",
+        description: "Please check your email to verify your account.",
       });
-      navigate('/dashboard');
-    } catch (error) {
+      navigate('/auth');
+    } catch (error: any) {
       toast({
         title: "Registration Failed",
-        description: "Please try again later",
+        description: error.message || "Please try again later",
         variant: "destructive",
       });
     } finally {
@@ -95,6 +100,32 @@ export function StudentRegistrationForm() {
               className="pl-10"
             />
             <UserPlus className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+          </div>
+
+          <div className="relative">
+            <Input
+              {...register("email", { 
+                required: true,
+                pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+              })}
+              type="email"
+              placeholder="Email Address"
+              className="pl-10"
+            />
+            <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+          </div>
+
+          <div className="relative">
+            <Input
+              {...register("password", { 
+                required: true,
+                minLength: 6
+              })}
+              type="password"
+              placeholder="Password"
+              className="pl-10"
+            />
+            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
           </div>
 
           <div className="relative">

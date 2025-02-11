@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,37 +12,53 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
+import { User, Lock, School } from 'lucide-react';
 
 const departments = ['CSE', 'ECE', 'ME', 'CE'];
 
 export function StaffRegistrationForm() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
+    password: '',
     department: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // Generate staff ID
-    const staffId = `STAFF-${Math.random().toString(36).substr(2, 3).toUpperCase()}`;
-    
-    // Store in localStorage
-    const userData = {
-      id: staffId,
-      name: formData.name,
-      role: 'staff' as const,
-      department: formData.department,
-    };
+    try {
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            role: 'staff',
+            department: formData.department,
+          }
+        }
+      });
 
-    login(userData);
-    toast({
-      title: "Registration Successful",
-      description: `Welcome! Your Staff ID is ${staffId}`,
-    });
-    navigate('/dashboard');
+      if (signUpError) throw signUpError;
+
+      toast({
+        title: "Registration Successful",
+        description: "Please check your email to verify your account.",
+      });
+      navigate('/auth');
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.message || "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,31 +69,62 @@ export function StaffRegistrationForm() {
       </div>
 
       <div className="space-y-4">
-        <Input
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-        />
+        <div className="relative">
+          <Input
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+            className="pl-10"
+          />
+          <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+        </div>
 
-        <Select
-          value={formData.department}
-          onValueChange={(value) => setFormData({ ...formData, department: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Department" />
-          </SelectTrigger>
-          <SelectContent>
-            {departments.map((dept) => (
-              <SelectItem key={dept} value={dept}>
-                {dept}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="relative">
+          <Input
+            type="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            className="pl-10"
+          />
+          <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+        </div>
 
-        <Button type="submit" className="w-full">
-          Register
+        <div className="relative">
+          <Input
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+            className="pl-10"
+          />
+          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+        </div>
+
+        <div className="relative">
+          <Select
+            value={formData.department}
+            onValueChange={(value) => setFormData({ ...formData, department: value })}
+          >
+            <SelectTrigger className="pl-10">
+              <SelectValue placeholder="Select Department" />
+            </SelectTrigger>
+            <SelectContent>
+              {departments.map((dept) => (
+                <SelectItem key={dept} value={dept}>
+                  {dept}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <School className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+        </div>
+
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Registering..." : "Register"}
         </Button>
       </div>
     </form>
