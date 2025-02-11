@@ -41,12 +41,17 @@ export function StaffRegistrationForm() {
         throw new Error('Password must be at least 6 characters long');
       }
 
+      // Basic validation
+      if (!formData.name || !formData.department) {
+        throw new Error('Please fill in all required fields');
+      }
+
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email.toLowerCase().trim(), // Normalize email
+        email: formData.email.toLowerCase().trim(),
         password: formData.password,
         options: {
           data: {
-            name: formData.name,
+            name: formData.name.trim(),
             role: 'staff',
             department: formData.department,
           },
@@ -54,7 +59,10 @@ export function StaffRegistrationForm() {
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        console.error('Signup error details:', signUpError);
+        throw signUpError;
+      }
 
       toast({
         title: "Registration Successful",
@@ -62,12 +70,12 @@ export function StaffRegistrationForm() {
       });
       navigate('/auth');
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: error.message || "Please try again later",
         variant: "destructive",
       });
-      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }

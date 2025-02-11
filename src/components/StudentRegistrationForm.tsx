@@ -47,7 +47,7 @@ export function StudentRegistrationForm() {
       }
 
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: data.email.toLowerCase().trim(), // Normalize email
+        email: data.email.toLowerCase().trim(),
         password: data.password,
         options: {
           data: {
@@ -61,7 +61,10 @@ export function StudentRegistrationForm() {
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        console.error('Signup error details:', signUpError);
+        throw signUpError;
+      }
 
       toast({
         title: "Registration Successful",
@@ -69,12 +72,12 @@ export function StudentRegistrationForm() {
       });
       navigate('/auth');
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: error.message || "Please try again later",
         variant: "destructive",
       });
-      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }
