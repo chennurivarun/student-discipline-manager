@@ -31,15 +31,26 @@ export function StaffRegistrationForm() {
     setIsLoading(true);
     
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
+      // Validate email format
+      if (!formData.email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Validate password length
+      if (formData.password.length < 6) {
+        throw new Error('Password must be at least 6 characters long');
+      }
+
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email.toLowerCase().trim(), // Normalize email
         password: formData.password,
         options: {
           data: {
             name: formData.name,
             role: 'staff',
             department: formData.department,
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth`
         }
       });
 
@@ -56,6 +67,7 @@ export function StaffRegistrationForm() {
         description: error.message || "Please try again later",
         variant: "destructive",
       });
+      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }

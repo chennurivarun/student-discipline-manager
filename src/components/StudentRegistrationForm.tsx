@@ -36,9 +36,18 @@ export function StudentRegistrationForm() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      // Register the user with Supabase
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: data.email,
+      // Validate email format
+      if (!data.email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Validate password length
+      if (data.password.length < 6) {
+        throw new Error('Password must be at least 6 characters long');
+      }
+
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: data.email.toLowerCase().trim(), // Normalize email
         password: data.password,
         options: {
           data: {
@@ -47,7 +56,8 @@ export function StudentRegistrationForm() {
             department: data.department,
             year: parseInt(data.year),
             semester: parseInt(data.semester),
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth`
         }
       });
 
@@ -64,6 +74,7 @@ export function StudentRegistrationForm() {
         description: error.message || "Please try again later",
         variant: "destructive",
       });
+      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }
