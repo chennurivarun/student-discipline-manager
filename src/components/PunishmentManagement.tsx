@@ -36,7 +36,7 @@ export function PunishmentManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <h2 className="text-2xl font-bold">Punishment Management</h2>
         <CreatePunishmentForm />
       </div>
@@ -45,28 +45,28 @@ export function PunishmentManagement() {
         <CardHeader>
           <CardTitle>Active Punishments</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Student ID</TableHead>
+                <TableHead className="w-[100px]">Student ID</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead className="hidden md:table-cell">Description</TableHead>
+                <TableHead className="hidden sm:table-cell">Date</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {punishments.map((punishment) => (
                 <TableRow key={punishment.id}>
-                  <TableCell>{punishment.studentId}</TableCell>
+                  <TableCell className="font-medium">{punishment.studentId}</TableCell>
                   <TableCell>{punishment.studentName}</TableCell>
                   <TableCell>{punishment.type}</TableCell>
-                  <TableCell>{punishment.description}</TableCell>
-                  <TableCell>{punishment.date}</TableCell>
+                  <TableCell className="hidden md:table-cell">{punishment.description}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{punishment.date}</TableCell>
                   <TableCell>
-                    <span className={`capitalize ${punishment.status === 'active' ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    <span className={`capitalize ${punishment.status === 'active' ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
                       {punishment.status}
                     </span>
                   </TableCell>

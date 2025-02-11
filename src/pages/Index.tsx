@@ -64,7 +64,7 @@ const Index = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <div className="w-full max-w-md space-y-8 fade-in">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Welcome Back
           </h1>
           <p className="text-muted-foreground">Sign in to manage student records</p>
@@ -103,14 +103,14 @@ const Index = () => {
             <Button 
               variant="outline" 
               onClick={() => navigate('/students/register')}
-              className="glass-morphism hover:bg-primary/20"
+              className="glass-morphism hover:bg-primary/20 text-primary"
             >
               Student Registration
             </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate('/staff/register')}
-              className="glass-morphism hover:bg-primary/20"
+              className="glass-morphism hover:bg-primary/20 text-primary"
             >
               Staff Registration
             </Button>
