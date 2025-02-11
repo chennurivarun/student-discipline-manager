@@ -9,7 +9,84 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          department: string | null
+          id: string
+          name: string | null
+          role: string | null
+          semester: number | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          id: string
+          name?: string | null
+          role?: string | null
+          semester?: number | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          id?: string
+          name?: string | null
+          role?: string | null
+          semester?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      punishments: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          resolved_at: string | null
+          staff_id: string | null
+          status: string | null
+          student_id: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          resolved_at?: string | null
+          staff_id?: string | null
+          status?: string | null
+          student_id?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          resolved_at?: string | null
+          staff_id?: string | null
+          status?: string | null
+          student_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "punishments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "punishments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

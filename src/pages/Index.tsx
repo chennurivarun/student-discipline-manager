@@ -13,51 +13,16 @@ const Index = () => {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Temporary login credentials for demo
-  const DEMO_CREDENTIALS = {
-    student: { id: '12345678', password: 'student123' },
-    staff: { id: 'STAFF123', password: 'staff123' }
-  };
-
-  const handleLogin = async (role: 'student' | 'staff', id: string, password: string) => {
+  const handleLogin = async (role: 'student' | 'staff', email: string, password: string) => {
     setIsLoading(true);
-    
-    // Demo authentication logic
-    const validCredentials = role === 'student' 
-      ? (id === DEMO_CREDENTIALS.student.id && password === DEMO_CREDENTIALS.student.password)
-      : (id === DEMO_CREDENTIALS.staff.id && password === DEMO_CREDENTIALS.staff.password);
-
-    if (validCredentials) {
-      const userData = role === 'student' 
-        ? {
-            id,
-            name: 'Demo Student',
-            role: 'student' as const,
-            department: 'CSE',
-            year: 2,
-            semester: 3,
-          }
-        : {
-            id,
-            name: 'Demo Staff',
-            role: 'staff' as const,
-            department: 'CSE',
-          };
-
-      login(userData);
-      toast({
-        title: "Login Successful",
-        description: `Welcome back, ${userData.name}!`,
-      });
+    try {
+      await login(email, password);
       navigate('/dashboard');
-    } else {
-      toast({
-        title: "Login Failed",
-        description: "Invalid credentials. Please try again.",
-        variant: "destructive",
-      });
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -79,9 +44,8 @@ const Index = () => {
           <TabsContent value="student" className="mt-4">
             <LoginCard
               title="Student Login"
-              description="Use your student ID to sign in"
-              onSubmit={(id, password) => handleLogin('student', id, password)}
-              demoCredentials={DEMO_CREDENTIALS.student}
+              description="Use your email to sign in"
+              onSubmit={(email, password) => handleLogin('student', email, password)}
               isLoading={isLoading}
             />
           </TabsContent>
@@ -89,9 +53,8 @@ const Index = () => {
           <TabsContent value="staff" className="mt-4">
             <LoginCard
               title="Staff Login"
-              description="Use your staff ID to sign in"
-              onSubmit={(id, password) => handleLogin('staff', id, password)}
-              demoCredentials={DEMO_CREDENTIALS.staff}
+              description="Use your email to sign in"
+              onSubmit={(email, password) => handleLogin('staff', email, password)}
               isLoading={isLoading}
             />
           </TabsContent>
@@ -125,16 +88,14 @@ const LoginCard = ({
   title, 
   description, 
   onSubmit, 
-  demoCredentials, 
   isLoading 
 }: { 
   title: string;
   description: string;
-  onSubmit: (id: string, password: string) => void;
-  demoCredentials: { id: string; password: string };
+  onSubmit: (email: string, password: string) => void;
   isLoading: boolean;
 }) => {
-  const [id, setId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return (
@@ -150,16 +111,16 @@ const LoginCard = ({
           <form 
             onSubmit={(e) => {
               e.preventDefault();
-              onSubmit(id, password);
+              onSubmit(email, password);
             }}
             className="space-y-4"
           >
             <div className="space-y-2">
               <Input
-                type="text"
-                placeholder="Enter ID"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="glass-morphism bg-transparent"
               />
               <Input
@@ -177,11 +138,6 @@ const LoginCard = ({
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-            <div className="text-sm text-muted-foreground mt-4 p-3 glass-morphism rounded-lg">
-              <p>Demo credentials:</p>
-              <p>ID: {demoCredentials.id}</p>
-              <p>Password: {demoCredentials.password}</p>
-            </div>
           </form>
         </CardContent>
       </Card>
