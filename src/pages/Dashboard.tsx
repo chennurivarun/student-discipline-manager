@@ -105,7 +105,7 @@ export default function Dashboard() {
               key={item.label}
               onClick={() => setCurrentView(item.view)}
               className={cn(
-                "flex flex-col items-center p-2 rounded-full transition-all duration-300 hover:scale-110 min-w-[4rem]",
+                "flex flex-col items-center p-2 rounded-xl transition-all duration-300 hover:scale-110 min-w-[4rem]",
                 currentView === item.view 
                   ? "bg-primary/20 text-primary scale-105" 
                   : "text-muted-foreground hover:text-primary hover:bg-primary/10"
