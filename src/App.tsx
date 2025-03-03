@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import { StudentRegistrationForm } from "./components/StudentRegistrationForm";
 import { StaffRegistrationForm } from "./components/StaffRegistrationForm";
 import Dashboard from "./pages/Dashboard";
+import { PunishmentProvider } from "./components/PunishmentContext";
 
 const queryClient = new QueryClient();
 
@@ -25,22 +26,24 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/students/register" element={<StudentRegistrationForm />} />
-            <Route path="/staff/register" element={<StaffRegistrationForm />} />
-            <Route
-              path="/dashboard/*"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <PunishmentProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/students/register" element={<StudentRegistrationForm />} />
+              <Route path="/staff/register" element={<StaffRegistrationForm />} />
+              <Route
+                path="/dashboard/*"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </PunishmentProvider>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

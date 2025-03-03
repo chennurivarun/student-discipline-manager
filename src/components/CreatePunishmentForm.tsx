@@ -20,15 +20,15 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
-interface CreatePunishmentFormProps {
-  onSuccess?: () => void;
-}
-
-interface PunishmentFormData {
+export interface PunishmentFormData {
   studentId: string;
   studentName: string;
   type: string;
   description: string;
+}
+
+interface CreatePunishmentFormProps {
+  onSuccess?: (data: PunishmentFormData) => void;
 }
 
 export function CreatePunishmentForm({ onSuccess }: CreatePunishmentFormProps) {
@@ -44,14 +44,13 @@ export function CreatePunishmentForm({ onSuccess }: CreatePunishmentFormProps) {
   });
 
   const onSubmit = (data: PunishmentFormData) => {
-    console.log("Form submitted:", data);
     toast({
       title: "Punishment Created",
       description: "The punishment has been successfully created.",
     });
+    onSuccess?.(data);
     setOpen(false);
     form.reset();
-    onSuccess?.();
   };
 
   return (
@@ -121,7 +120,11 @@ export function CreatePunishmentForm({ onSuccess }: CreatePunishmentFormProps) {
               )}
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create</Button>
